@@ -20,6 +20,7 @@ type TestResult struct {
 	SuccessfullRequest int
 	FailedRequests     int
 	StatusCodes        map[int]int
+	ElapsedTime        time.Duration
 }
 
 type response struct {
@@ -36,6 +37,8 @@ func NewStressTester(concurrency, requests int, url string, timeout time.Duratio
 }
 
 func (s *StressTester) Run() *TestResult {
+	startedAt := time.Now()
+
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 
 	defer cancel()
@@ -78,6 +81,7 @@ func (s *StressTester) Run() *TestResult {
 		SuccessfullRequest: successfullRequests,
 		FailedRequests:     s.requests - successfullRequests,
 		StatusCodes:        statusCodes,
+		ElapsedTime:        time.Since(startedAt),
 	}
 }
 

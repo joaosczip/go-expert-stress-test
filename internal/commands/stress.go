@@ -32,6 +32,8 @@ func (s *StressCommand) Run() {
 		tableData = append(tableData, []string{fmt.Sprintf("%d - Status code", status), fmt.Sprintf("%d", total)})
 	}
 
+	tableData = append(tableData, []string{"Elapsed Time", testResult.ElapsedTime.String()})
+
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Metric", "Count"})
 

@@ -15,6 +15,13 @@ type StressTester struct {
 	timeout     time.Duration
 }
 
+type TestResult struct {
+	TotalRequests      int
+	SuccessfullRequest int
+	FailedRequests     int
+	StatusCodes        map[int]int
+}
+
 type response struct {
 	statusCode int
 }
@@ -28,7 +35,7 @@ func NewStressTester(concurrency, requests int, url string, timeout time.Duratio
 	}
 }
 
-func (s *StressTester) Run() {
+func (s *StressTester) Run() *TestResult {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 
 	defer cancel()
@@ -66,13 +73,12 @@ func (s *StressTester) Run() {
 	close(responses)
 	close(errorsCh)
 
-	for status, total := range statusCodes {
-		fmt.Printf("Status %d: %d\n", status, total)
+	return &TestResult{
+		TotalRequests:      s.requests,
+		SuccessfullRequest: successfullRequests,
+		FailedRequests:     s.requests - successfullRequests,
+		StatusCodes:        statusCodes,
 	}
-
-	fmt.Printf("Total requests: %d\n", s.requests)
-	fmt.Printf("Successfull requests: %d\n", successfullRequests)
-	fmt.Printf("Failed requests: %d\n", s.requests-successfullRequests)
 }
 
 func (s *StressTester) doRequest(ctx context.Context, i int, guard <-chan struct{}, responses chan<- response, errorsCh chan<- error) {

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type stressTester struct {
+type StressTester struct {
 	concurrency int
 	requests    int
 	url         string
@@ -19,8 +19,8 @@ type response struct {
 	statusCode int
 }
 
-func NewStressTester(concurrency, requests int, url string, timeout time.Duration) *stressTester {
-	return &stressTester{
+func NewStressTester(concurrency, requests int, url string, timeout time.Duration) *StressTester {
+	return &StressTester{
 		concurrency: concurrency,
 		requests:    requests,
 		url:         url,
@@ -28,7 +28,7 @@ func NewStressTester(concurrency, requests int, url string, timeout time.Duratio
 	}
 }
 
-func (s *stressTester) Run() {
+func (s *StressTester) Run() {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 
 	defer cancel()
@@ -75,7 +75,7 @@ func (s *stressTester) Run() {
 	fmt.Printf("Failed requests: %d\n", s.requests-successfullRequests)
 }
 
-func (s *stressTester) doRequest(ctx context.Context, i int, guard <-chan struct{}, responses chan<- response, errorsCh chan<- error) {
+func (s *StressTester) doRequest(ctx context.Context, i int, guard <-chan struct{}, responses chan<- response, errorsCh chan<- error) {
 	fmt.Printf("Processing request %d\n", i)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.url, nil)

@@ -56,6 +56,7 @@ func (s *StressTester) Run() *TestResult {
 
 	statusCodes := make(map[int]int)
 	successfullRequests := 0
+	totalRequests := 0
 
 	for i := 0; i < s.requests; i++ {
 		select {
@@ -64,12 +65,14 @@ func (s *StressTester) Run() *TestResult {
 			if response.statusCode >= 200 && response.statusCode < 300 {
 				successfullRequests++
 			}
+			totalRequests++
 		case err := <-errorsCh:
 			if errors.Is(err, context.DeadlineExceeded) {
 				statusCodes[504]++
 			} else {
 				statusCodes[500]++
 			}
+			totalRequests++
 		}
 	}
 
@@ -77,9 +80,9 @@ func (s *StressTester) Run() *TestResult {
 	close(errorsCh)
 
 	return &TestResult{
-		TotalRequests:      s.requests,
+		TotalRequests:      totalRequests,
 		SuccessfullRequest: successfullRequests,
-		FailedRequests:     s.requests - successfullRequests,
+		FailedRequests:     totalRequests - successfullRequests,
 		StatusCodes:        statusCodes,
 		ElapsedTime:        time.Since(startedAt),
 	}
